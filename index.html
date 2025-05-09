@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calligraphy Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Pacifico&family=Satisfy&family=Kaushan+Script&family=Indie+Flower&family=Shadows+Into+Light&family=Cinzel+Decorative&family=Sacramento&family=Courgette&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3rem;
+      color: #333;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      max-width: 90%;
+      width: 600px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      resize: none;
+      margin-bottom: 20px;
+    }
+
+    .output {
+      font-size: 2.5rem;
+      word-wrap: break-word;
+      min-height: 60px;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.15);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    button, select, input[type="color"], input[type="range"] {
+      margin: 10px 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #4b0082;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #5e2b97;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calligraphy Generator</h1>
+    <textarea id="inputText" rows="3" placeholder="Type your text here..."></textarea>
+    <div class="controls">
+      <select id="fontSelect">
+        <option value="'Great Vibes', cursive">Great Vibes</option>
+        <option value="'Dancing Script', cursive">Dancing Script</option>
+        <option value="'Pacifico', cursive">Pacifico</option>
+        <option value="'Satisfy', cursive">Satisfy</option>
+        <option value="'Kaushan Script', cursive">Kaushan Script</option>
+        <option value="'Indie Flower', cursive">Indie Flower</option>
+        <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+        <option value="'Cinzel Decorative', cursive">Cinzel Decorative</option>
+        <option value="'Sacramento', cursive">Sacramento</option>
+        <option value="'Courgette', cursive">Courgette</option>
+      </select>
+      <input type="color" id="textColor" title="Text Color" />
+      <input type="color" id="bgColor" title="Background Color" />
+      <input type="range" id="fontSize" min="20" max="100" value="40" title="Font Size" />
+      <select id="textAlign">
+        <option value="center">Center</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+      </select>
+      <select id="fontWeight">
+        <option value="normal">Normal</option>
+        <option value="bold">Bold</option>
+      </select>
+      <select id="fontStyle">
+        <option value="normal">Normal</option>
+        <option value="italic">Italic</option>
+      </select>
+    </div>
+    <button onclick="generateCalligraphy()">Generate</button>
+    <button onclick="downloadImage()">Download Image</button>
+    <button onclick="downloadPDF()">Export as PDF</button>
+    <button onclick="saveSettings()">Save Settings</button>
+    <button onclick="resetSettings()">Reset</button>
+    <div class="output" id="outputText"></div>
+  </div>
+
+  <script>
+    function generateCalligraphy() {
+      const input = document.getElementById("inputText").value;
+      const font = document.getElementById("fontSelect").value;
+      const textColor = document.getElementById("textColor").value;
+      const bgColor = document.getElementById("bgColor").value;
+      const fontSize = document.getElementById("fontSize").value;
+      const textAlign = document.getElementById("textAlign").value;
+      const fontWeight = document.getElementById("fontWeight").value;
+      const fontStyle = document.getElementById("fontStyle").value;
+      const output = document.getElementById("outputText");
+
+      output.style.fontFamily = font;
+      output.style.backgroundColor = bgColor;
+      output.style.fontSize = fontSize + "px";
+      output.style.textAlign = textAlign;
+      output.style.fontWeight = fontWeight;
+      output.style.fontStyle = fontStyle;
+      output.style.backgroundImage = `linear-gradient(45deg, ${textColor}, ${textColor}cc)`;
+      output.textContent = input;
+    }
+
+    function downloadImage() {
+      const output = document.getElementById("outputText");
+      html2canvas(output).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'calligraphy.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    function downloadPDF() {
+      const output = document.getElementById("outputText");
+      html2canvas(output).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save("calligraphy.pdf");
+      });
+    }
+
+    function saveSettings() {
+      const settings = {
+        inputText: document.getElementById("inputText").value,
+        font: document.getElementById("fontSelect").value,
+        textColor: document.getElementById("textColor").value,
+        bgColor: document.getElementById("bgColor").value,
+        fontSize: document.getElementById("fontSize").value,
+        textAlign: document.getElementById("textAlign").value,
+        fontWeight: document.getElementById("fontWeight").value,
+        fontStyle: document.getElementById("fontStyle").value
+      };
+      localStorage.setItem("calligraphySettings", JSON.stringify(settings));
+      alert("Settings saved!");
+    }
+
+    function resetSettings() {
+      localStorage.removeItem("calligraphySettings");
+      location.reload();
+    }
+
+    window.onload = () => {
+      const saved = JSON.parse(localStorage.getItem("calligraphySettings"));
+      if (saved) {
+        document.getElementById("inputText").value = saved.inputText || "";
+        document.getElementById("fontSelect").value = saved.font || "";
+        document.getElementById("textColor").value = saved.textColor || "#000000";
+        document.getElementById("bgColor").value = saved.bgColor || "#ffffff";
+        document.getElementById("fontSize").value = saved.fontSize || 40;
+        document.getElementById("textAlign").value = saved.textAlign || "center";
+        document.getElementById("fontWeight").value = saved.fontWeight || "normal";
+        document.getElementById("fontStyle").value = saved.fontStyle || "normal";
+        generateCalligraphy();
+      }
+    };
+  </script>
+</body>
+</html>
